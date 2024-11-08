@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>HTML5 Video y Canvas para tomar fotos - jsFiddle demo</title>
+  
+  <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.3.js'></script>
+  
+  <link rel="stylesheet" type="text/css" href="/css/normalize.css">
+  
+  
+  <script type="text/javascript" src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+  
+  <script type="text/javascript" src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.css">
+  
+  <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+  
+  <style type='text/css'>
+    .contenedor{ width: 350px; float: left;}
+.titulo{ font-size: 12pt; font-weight: bold;}
+#camara, #foto{
+    width: 320px;
+    min-height: 240px;
+    border: 1px solid #008000;
+}
+
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+$(function(){
+//Nos aseguramos que estÃ©n definidas
+//algunas funciones bÃ¡sicas
+window.URL = window.URL || window.webkitURL;
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia ||
+function() {
+    alert('Su navegador no soporta navigator.getUserMedia().');
+};
+
+//Este objeto guardarÃ¡ algunos datos sobre la cÃ¡mara
+window.datosVideo = {
+    'StreamVideo': null,
+    'url': null
+}
+
+jQuery('#botonIniciar').on('click', function(e) {
+
+    //Pedimos al navegador que nos da acceso a 
+    //algÃºn dispositivo de video (la webcam)
+    navigator.getUserMedia({
+        'audio': false,
+        'video': true
+    }, function(streamVideo) {
+        datosVideo.StreamVideo = streamVideo;
+        datosVideo.url = window.URL.createObjectURL(streamVideo);
+        jQuery('#camara').attr('src', datosVideo.url);
+
+    }, function() {
+        alert('No fue posible obtener acceso a la cÃ¡mara.');
+    });
+
+});
+
+jQuery('#botonDetener').on('click', function(e) {
+
+    if (datosVideo.StreamVideo) {
+        datosVideo.StreamVideo.stop();
+        window.URL.revokeObjectURL(datosVideo.url);
+    }
+
+});
+
+jQuery('#botonFoto').on('click', function(e) {
+    var oCamara, oFoto, oContexto, w, h;
+
+    oCamara = jQuery('#camara');
+    oFoto = jQuery('#foto');
+    w = oCamara.width();
+    h = oCamara.height();
+    oFoto.attr({
+        'width': w,
+        'height': h
+    });
+    oContexto = oFoto[0].getContext('2d');
+    oContexto.drawImage(oCamara[0], 0, 0, w, h);
+
+});
+});//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <div id='botonera'>
+    <input id='botonIniciar' type='button' value = 'Iniciar'></input>
+    <input id='botonDetener' type='button' value = 'Detener'></input>
+    <input id='botonFoto' type='button' value = 'Foto'></input>
+</div>
+<div class="contenedor">
+    <div class="titulo">CÃ¡mara</div>
+    <video id="camara" autoplay ></video>
+</div>
+<div class="contenedor">
+    <div class="titulo">Foto</div>
+    <canvas id="foto" ></canvas>
+</div>    
+
+  
+</body>
+
+
+</html>
+
+
